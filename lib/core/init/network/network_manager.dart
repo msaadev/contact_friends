@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 
 class NetworkManager {
@@ -9,14 +11,40 @@ class NetworkManager {
   }
 
   NetworkManager._init() {
-    final BaseOptions baseOptions =
-        BaseOptions(baseUrl: 'http://test11.internative.net/');
-    _dio = Dio();
+    final BaseOptions baseOptions = BaseOptions(
+        baseUrl: 'https://jsonplaceholder.typicode.com/',
+        contentType: 'application/json; charset=utf-8');
+    _dio = Dio(baseOptions);
+   
   }
 
-  late final Dio _dio;
+ late final Dio _dio;
 
-  Future<void> dioGet<T>(String path, T model) async {
+  Future<dynamic>? dioGet(
+    String path,
+  ) async {
     final response = await _dio.get(path);
+    print(response.data);
+    return ifElse(response);
+  }
+
+  Future dioPost({required String path, required Map data}) async {
+    final response = await _dio.post(path,
+        data: data,
+        options: Options(headers: {
+          "Authorization": "eren@test.com",
+        }));
+    print(response.data);
+    print(response.headers);
+
+    return ifElse(response);
+  }
+
+  dynamic ifElse(Response response) {
+    if (response.statusCode == HttpStatus.ok) {
+      return response.data;
+    } else {
+      return null;
+    }
   }
 }
